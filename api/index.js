@@ -7,14 +7,16 @@ const TOTAL_SUPPLY = 1_000_000_000n * 10n ** 18n;
 
 const MULTICALL3 = "0xcA11bde05977b3631167028862bE2a173976CA11";
 
-// Fixed wallets to deduct (treasury/staking/glacier)
+// Fixed wallets to deduct (treasury/staking)
 const FIXED_WALLETS = [
   "0x03ed348892a88182e74d8e76e6f7529224032ed8", // Staking Y1-2
   "0xd7740bf4fbd6f7633aec11e51f9b8d7dd6c0ae40", // Staking Y3-6
   "0x21d91cedf2cf162c87f14ce988a04c35737f7e0d", // Staking Y7-10
   "0x6a553c044a6a113b01be52372e8d7bc94594bbe8", // Treasury
-  "0xbCf2428b30A2EEc281a8da2EC93C93B499a7987b", // Glacier
 ];
+
+// Manual reduction for tokens not yet trackable on-chain
+const MANUAL_DEDUCTION = 95_055_185n * 10n ** 18n;
 
 const ERC20_BALANCE_OF = "0x70a08231"; // balanceOf(address)
 
@@ -62,7 +64,7 @@ module.exports = async function handler(req, res) {
 
     const totalLocked = await batchBalances(provider, allAddresses);
 
-    const circulating = TOTAL_SUPPLY - totalLocked;
+    const circulating = TOTAL_SUPPLY - totalLocked - MANUAL_DEDUCTION;
     const circulatingFormatted = Number(circulating / 10n ** 18n);
 
     res.status(200).send(circulatingFormatted.toString());
